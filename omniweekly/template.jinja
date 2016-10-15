@@ -1,0 +1,27 @@
+1. 已经完成：
+{%- for project in tasks | project_with_completed_tasks %}
+   + {{ project.name }}
+   {%- for task in tasks | is_task_of(project) | is_complete %}
+     - {{ task.name }}{%- if task.note.content -%}：{{ task.note.content }}{%- endif %}
+     {%- if task.note.metadata.issue %}  
+       {% if task.note.metadata.issue -%}[[过程记录]({{ task.note.metadata.issue }})]{%- endif -%}
+     {%- endif -%}
+   {%- endfor %}
+{%- endfor %}
+
+2. 仍在进行：
+{%- for project in tasks | project_with_incomplete_tasks %}
+   + {{ project.name }}
+   {%- for task in tasks | is_task_of(project) | is_processing %}
+     - {{ task.name }}  
+       [估计进度 {{ task.note.metadata.progress }}]
+   {%- endfor %}
+{%- endfor %}
+
+3. 下周计划：
+{%- for project in tasks | project_with_incomplete_tasks %}
+   + {{ project.name }}
+   {%- for task in tasks | is_task_of(project) | is_incomplete %}
+     - {{ task.name }}
+   {%- endfor %}
+{%- endfor %}
