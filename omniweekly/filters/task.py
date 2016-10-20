@@ -32,6 +32,14 @@ def project_with_incomplete_tasks(iterable):
                   is_project(iterable))
 
 
+def project_with_processing_tasks(iterable):
+    if iterable is None or isinstance(iterable, Undefined):
+        return iterable
+    return filter(lambda x: len(
+        filter(lambda y: y.parent == x.persistentIdentifier and y.dateCompleted is None and 'progress' in y.note.metadata, iterable)) > 0,
+                  is_project(iterable))
+
+
 def is_complete(iterable):
     if iterable is None or isinstance(iterable, Undefined):
         return iterable
