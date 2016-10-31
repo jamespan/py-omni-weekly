@@ -93,6 +93,10 @@ def main():
                           Column('dateModified', FloatDateTime(args.timezone)),
                           Column('dateAdded', FloatDateTime(args.timezone)),
                           Column('dateCompleted', FloatDateTime(args.timezone)),
+                          Column('effectiveDateToStart', FloatDateTime(args.timezone)),
+                          Column('dateToStart', FloatDateTime(args.timezone)),
+                          Column('effectiveDateDue', FloatDateTime(args.timezone)),
+                          Column('dateDue', FloatDateTime(args.timezone)),
                           autoload=True)
 
     session = create_session(bind=engine)
@@ -101,7 +105,8 @@ def main():
         datetime.datetime.strptime(args.deadline, '%Y-%m-%d')) + datetime.timedelta(days=1)
 
     tasks = session.query(Task).filter(
-        or_(Task.dateCompleted >= deadline - datetime.timedelta(days=args.period),
+        or_(and_(Task.dateCompleted >= deadline - datetime.timedelta(days=args.period),
+                 Task.dateCompleted < deadline),
             Task.dateCompleted.is_(None),
             Task.parent.is_(None))
     ).all()
