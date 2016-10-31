@@ -119,6 +119,8 @@ def main():
                 post.metadata['issue'] = re.sub(r"\s+<.+>$", "", issue)
         else:
             post = frontmatter.loads("")
+        # exclude content lines import from OmniPlan
+        post.content = '\n'.join(filter(lambda x: not x.startswith('Metadata:'), post.content.splitlines()))
         setattr(task, 'note', post)
 
     from jinja2 import Environment, FileSystemLoader
@@ -128,7 +130,7 @@ def main():
     for _ in filters.__all__:
         env.filters[_.__name__] = _
 
-    rendered = env.get_template(os.path.basename(args.template)).render(tasks=tasks)
+    rendered = env.get_template(os.path.basename(args.template)).render(tasks=tasks, deadline=deadline)
     print(rendered.encode('utf-8'))
 
 if __name__ == '__main__':

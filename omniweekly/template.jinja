@@ -1,27 +1,64 @@
-1. 已经完成：
-{%- for project in tasks | project_with_completed_tasks %}
-   + {{ project.name }}
-   {%- for task in tasks | is_task_of(project) | is_complete %}
-     - {{ task.name }}{%- if task.note.content -%}：{{ task.note.content }}{%- endif %}
-     {%- if task.note.metadata.issue %}  
-       {% if task.note.metadata.issue -%}[[过程记录]({{ task.note.metadata.issue }})]{%- endif -%}
-     {%- endif -%}
-   {%- endfor %}
-{%- endfor %}
+<ul> <li>工作项进展汇总
 
-2. 仍在进行：
-{%- for project in tasks | project_with_processing_tasks %}
-   + {{ project.name }}
-   {%- for task in tasks | is_task_of(project) | is_processing %}
-     - {{ task.name }}  
-       [估计进度 {{ task.note.metadata.progress }}]
+<table>
+   <tr>
+      <th>工作项</th>
+      <th>预期完成时间</th>
+      <th>当前进展</th>
+      <th>进展描述</th>
+      <th>补充说明</th>
+   </tr>
+{% for project in tasks | project_with_completed_tasks %}
+   {% for task in tasks | is_task_of(project) | is_complete %}
+   <tr>
+       <td>{{ project.name }} - {{ task.name }}</td>
+       <td>{% if task.dateDue %}{{ task.dateDue | date }}{% endif %}</td>
+       <td>完成</td>
+       <td>{% if not task.dateDue or task.dateCompleted <= task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
+       <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
+   </tr>
    {%- endfor %}
 {%- endfor %}
+{%- for project in tasks | project_with_processing_tasks | sort(attribute='dateDue') %}
+   {%- for task in tasks | is_task_of(project) | is_processing | sort(attribute='dateDue') %}
+   <tr>
+       <td>{{ project.name }} - {{ task.name }}</td>
+       <td>{% if task.dateDue %}{{ task.dateDue | date }}{% endif %}</td>
+       <td>{{ task.note.metadata.progress }}</td>
+       <td>{% if not task.dateDue or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
+       <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
+   </tr>
+   {%- endfor %}
+{%- endfor %}
+{%- for project in tasks | project_with_incomplete_tasks | sort(attribute='dateDue') %}
+   {%- for task in tasks | is_task_of(project) | is_incomplete | sort(attribute='dateDue') %}
+   <tr>
+       <td>{{ project.name }} - {{ task.name }}</td>
+       <td>{% if task.dateDue %}{{ task.dateDue | date }}{% endif %}</td>
+       <td>未开始</td>
+       <td>{% if not task.dateDue or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
+       <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
+   </tr>
+   {%- endfor %}
+{%- endfor %}
+</table>
 
-3. 下周计划：
-{%- for project in tasks | project_with_incomplete_tasks %}
-   + {{ project.name }}
-   {%- for task in tasks | is_task_of(project) | is_incomplete %}
-     - {{ task.name }}
-   {%- endfor %}
-{%- endfor %}
+补充说明：
+
+<ol>
+{% for project in tasks -%}
+{%- for task in tasks | is_task_of(project) %}
+{%- if task.note.content | length >= 10 -%}
+<li>
+<p>{{ project.name }} - {{ task.name }}:</p>
+<p>{{ task.note.content }}</p>
+</li>
+{% endif -%}
+{%- endfor -%}{%- endfor %}
+</ol>
+  
+</li>
+<li>风险与困难</li>
+
+<li>其他</li>
+</ul>
