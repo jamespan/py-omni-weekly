@@ -8,11 +8,11 @@
       <th>进展描述</th>
       <th>补充说明</th>
    </tr>
-{% for project in tasks | project_with_completed_tasks %}
-   {% for task in tasks | is_task_of(project) | is_complete %}
+{% for project in tasks | project_with_completed_tasks | sort(attribute='dateDue') %}
+   {% for task in tasks | is_task_of(project) | is_complete | sort(attribute='dateDue') %}
    <tr>
        <td>{{ project.name }} - {{ task.name }}</td>
-       <td>{% if task.dateDue %}{{ task.dateDue | date }}{% endif %}</td>
+       <td>{% if task.dateDue and task.dateDue != epoch %}{{ task.dateDue | date }}{% endif %}</td>
        <td>完成</td>
        <td>{% if not task.dateDue or task.dateCompleted <= task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
        <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
@@ -23,7 +23,7 @@
    {%- for task in tasks | is_task_of(project) | is_processing | sort(attribute='dateDue') %}
    <tr>
        <td>{{ project.name }} - {{ task.name }}</td>
-       <td>{% if task.dateDue %}{{ task.dateDue | date }}{% endif %}</td>
+       <td>{% if task.dateDue and task.dateDue != epoch %}{{ task.dateDue | date }}{% endif %}</td>
        <td>{{ task.note.metadata.progress }}</td>
        <td>{% if not task.dateDue or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
        <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
@@ -34,7 +34,7 @@
    {%- for task in tasks | is_task_of(project) | not_started | sort(attribute='dateDue') %}
    <tr>
        <td>{{ project.name }} - {{ task.name }}</td>
-       <td>{% if task.dateDue %}{{ task.dateDue | date }}{% endif %}</td>
+       <td>{% if task.dateDue and task.dateDue != epoch %}{{ task.dateDue | date }}{% endif %}</td>
        <td>未开始</td>
        <td>{% if not task.dateDue or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
        <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>

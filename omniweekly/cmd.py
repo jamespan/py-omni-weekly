@@ -88,6 +88,13 @@ def main():
                                                         pytz.timezone(self.timezone))
             return value
 
+    class NullToEpochFloatDateTime(FloatDateTime):
+        def process_result_value(self, value, dialect):
+            value = super(NullToEpochFloatDateTime, self).process_result_value(value, dialect)
+            if value is None:
+                value = datetime.datetime.fromtimestamp(0, pytz.utc)
+            return value
+
     class Task(Base):
         __table__ = Table('Task', metadata,
                           Column('dateModified', FloatDateTime(args.timezone)),
@@ -96,7 +103,7 @@ def main():
                           Column('effectiveDateToStart', FloatDateTime(args.timezone)),
                           Column('dateToStart', FloatDateTime(args.timezone)),
                           Column('effectiveDateDue', FloatDateTime(args.timezone)),
-                          Column('dateDue', FloatDateTime(args.timezone)),
+                          Column('dateDue', NullToEpochFloatDateTime(args.timezone)),
                           autoload=True)
 
     session = create_session(bind=engine)
@@ -130,8 +137,13 @@ def main():
     for _ in filters.__all__:
         env.filters[_.__name__] = _
 
-    rendered = env.get_template(os.path.basename(args.template)).render(tasks=tasks, deadline=deadline)
+    rendered = env.get_template(os.path.basename(args.template)).render(
+        tasks=tasks,
+        deadline=deadline,
+        epoch=datetime.datetime.fromtimestamp(0, pytz.utc),
+    )
     print(rendered.encode('utf-8'))
+
 
 if __name__ == '__main__':
     main()
