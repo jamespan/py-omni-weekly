@@ -31,7 +31,7 @@
    {%- endfor %}
 {%- endfor %}
 {%- for project in tasks | project_with_incomplete_tasks | sort(attribute='dateDue') %}
-   {%- for task in tasks | is_task_of(project) | is_incomplete | sort(attribute='dateDue') %}
+   {%- for task in tasks | is_task_of(project) | not_started | sort(attribute='dateDue') %}
    <tr>
        <td>{{ project.name }} - {{ task.name }}</td>
        <td>{% if task.dateDue %}{{ task.dateDue | date }}{% endif %}</td>

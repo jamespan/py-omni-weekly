@@ -57,3 +57,9 @@ def is_processing(iterable):
     if iterable is None or isinstance(iterable, Undefined):
         return iterable
     return filter(lambda x: 'progress' in x.note.metadata, is_incomplete(iterable))
+
+
+def not_started(iterable):
+    if iterable is None or isinstance(iterable, Undefined):
+        return iterable
+    return filter(lambda x: 'progress' not in x.note.metadata, is_incomplete(iterable))
