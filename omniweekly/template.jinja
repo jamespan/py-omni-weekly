@@ -14,7 +14,7 @@
        <td>{{ project.name }} - {{ task.name }}</td>
        <td>{% if task.dateDue and task.dateDue != epoch %}{{ task.dateDue | date }}{% endif %}</td>
        <td>完成</td>
-       <td>{% if not task.dateDue or task.dateCompleted <= task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
+       <td>{% if not task.dateDue or task.dateDue == epoch or task.dateCompleted <= task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
        <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
    </tr>
    {%- endfor %}
@@ -25,7 +25,7 @@
        <td>{{ project.name }} - {{ task.name }}</td>
        <td>{% if task.dateDue and task.dateDue != epoch %}{{ task.dateDue | date }}{% endif %}</td>
        <td>{{ task.note.metadata.progress }}</td>
-       <td>{% if not task.dateDue or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
+       <td>{% if not task.dateDue or task.dateDue == epoch or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
        <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
    </tr>
    {%- endfor %}
@@ -36,7 +36,7 @@
        <td>{{ project.name }} - {{ task.name }}</td>
        <td>{% if task.dateDue and task.dateDue != epoch %}{{ task.dateDue | date }}{% endif %}</td>
        <td>未开始</td>
-       <td>{% if not task.dateDue or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
+       <td>{% if not task.dateDue or task.dateDue == epoch or deadline < task.dateDue %}符合预期{% else %}DELAY{% endif %}</td>
        <td>{% if task.note.content | length < 10 %}{{ task.note.content }}{% endif %}</td>
    </tr>
    {%- endfor %}
